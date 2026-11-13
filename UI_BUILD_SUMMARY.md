@@ -1,3 +1,7 @@
+> **Superseded (Nov 13, 2026).** This describes the first mock UI (`/dashboard/*` with hardcoded data), which has been
+> replaced by the working MVP: `/auth/*`, `/welcome/*`, the member portal `/m/[org]` and the officer console `/o/[org]`.
+> See `docs/HeronKaban_Architecture.md` §0 for the current structure. Kept for the design notes only.
+
 # HeronKaban UI/UX Build Summary
 
 ## Overview
