@@ -14,7 +14,9 @@
     "db:studio": "drizzle-kit studio",
     "chain:install": "npm --prefix blockchain install",
     "chain:compile": "npm --prefix blockchain run compile",
-    "chain:test": "npm --prefix blockchain run test"
+    "chain:test": "npm --prefix blockchain run test",
+    "chain:node": "npm --prefix blockchain run node",
+    "chain:deploy:local": "npm --prefix blockchain run deploy:local"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

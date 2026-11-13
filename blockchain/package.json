@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "compile": "hardhat build",
+    "compile": "hardhat build && hardhat run scripts/export-abi.ts",
     "test": "hardhat test",
+    "node": "hardhat node",
+    "export-abi": "hardhat run scripts/export-abi.ts",
+    "deploy:local": "hardhat run scripts/deploy-local.ts",
     "deploy:testnet": "hardhat ignition deploy --network bscTestnet",
     "verify:testnet": "hardhat verify --network bscTestnet"
   },

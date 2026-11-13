@@ -15,10 +15,12 @@ export default defineConfig({
     profiles: {
       default: {
         version: "0.8.34",
+        settings: { evmVersion: "cancun" },
       },
       production: {
         version: "0.8.34",
         settings: {
+          evmVersion: "cancun",
           optimizer: { enabled: true, runs: 200 },
         },
       },
@@ -28,6 +30,14 @@ export default defineConfig({
     hardhatMainnet: {
       type: "edr-simulated",
       chainType: "l1",
+    },
+    // Local Hardhat node (`npm run node`): chain id 31337, pre-funded public test keys.
+    // The organizers' recommendation while BSC testnet faucet funds are unavailable.
+    localhost: {
+      type: "http",
+      chainType: "l1",
+      chainId: 31337,
+      url: "http://127.0.0.1:8545",
     },
     // BNB Smart Chain testnet (chain id 97). Testnet only: hackathon rule.
     bscTestnet: {
