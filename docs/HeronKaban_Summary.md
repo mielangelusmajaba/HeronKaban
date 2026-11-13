@@ -109,10 +109,24 @@ A transparent treasury for UMak student organizations. Dues and event funds sit 
 - Handbook rules were read from a scanned PDF using OCR. Verify wording before quoting.
 - AI flags can be wrong. They go to humans for review and never block payment on their own.
 
-## 9. Open items
+## 9. Decisions made on build day (Nov 13)
 
-- Exact UMak email domain
-- Whether to use hidden app-generated test wallets for users
+- **Sign-in:** Google only, for both sign-in and sign-up (sign-up adds a name and college step). The UMak domain is checked on the server in three places (auth hook, OAuth callback, every request).
+- **Consent:** the agree button unlocks only after scrolling to the end of the Terms and Privacy Notice.
+- **Onboarding:** after consent, a two-card modal asks "Student Member" or "Student Officer". Roles are per org, so one student can be a member of one org and an officer of another.
+- **Orgs:** any UMak student can create an org and becomes its President. New orgs show "Unverified" until a platform admin verifies them.
+- **Joining:** a join code joins instantly; otherwise a request is approved by an officer (members) or the President (officer/committee seats).
+- **Hierarchy:** President > Officer (exec board) > Committee (exec comms) > Member. The President marks which officers are on-chain signers.
+- **Wallets:** signer officers use their own MetaMask (local Hardhat accounts for the demo). Members pay dues through an app-managed demo wallet (custodial, disclosed).
+- **Blockchain:** a local Hardhat node for now (the BSC faucet needs a mainnet balance). Switching to BSC testnet is a config change.
+- **Model:** reimbursement (spend first, file the receipt, get paid back).
+
+## 10. Open items
+
+- Exact UMak email domain (code uses `umak.edu.ph`)
+- ~~Whether to use hidden app-generated test wallets for users~~ Decided: custodial demo wallet for members, MetaMask for signers
+- Confirm with the organizers (in writing) whether a local-node deployment satisfies the "deployed and verified on BSC" requirement
+- Google Cloud OAuth client + Supabase Google provider setup, and enabling the "Before User Created" hook in Supabase
 - Number of officers who typically handle funds (waiting on our source; for now 2-3, threshold set per org)
 - A set of 10 dummy sample receipts for testing (team is finding them), including 4 planted problem cases
 - Decided: no paid credits. Everything stays free.

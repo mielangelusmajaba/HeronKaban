@@ -1,6 +1,7 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { publicEnv } from "@/lib/env/public";
 
 /**
@@ -9,6 +10,9 @@ import { publicEnv } from "@/lib/env/public";
  * With Cache Components on, callers that read the session must sit behind <Suspense>.
  */
 export async function createClient() {
+  // The Supabase client reads the clock (Date.now) while loading the session; mark this
+  // as request-time work so Cache Components doesn't try to prerender it.
+  await connection();
   const cookieStore = await cookies();
   const env = publicEnv();
 

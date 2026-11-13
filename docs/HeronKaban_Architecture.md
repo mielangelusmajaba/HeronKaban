@@ -1,8 +1,59 @@
 # HeronKaban: Web App Structure & Idea Review
 
-**Status:** Draft for team review, Nov 12, 2026
-**Companion to:** `HeronKaban_PRD.md`, `HeronKaban_Summary.md`
+**Status:** Draft for team review, Nov 12, 2026. **Updated Nov 13** with the implemented MVP (section 0 below wins where it differs from older sections).
+**Companion to:** `HeronKaban_PRD.md`, `HeronKaban_Summary.md`, `HeronKaban_Setup_Progress.md`
 **Purpose:** Lock the app *structure* before any UI/UX. Includes an honest critique of the idea.
+
+---
+
+## 0. Implemented MVP (Nov 13): what the code actually does
+
+### 0.1 User journey
+```
+Landing (/) → Sign up / Sign in with UMak Google (/auth/sign-up, /auth/sign-in)
+  → /auth/callback  (server checks @umak.edu.ph; non-UMak accounts are signed out and deleted)
+  → /auth/continue  (one router: profile → consent → welcome → org)
+  → /auth/sign-up   profile step (full name, college)
+  → /auth/consent   scroll-to-the-end gate, saves consent version + time
+  → /welcome        modal with two cards over a dimmed, blurred backdrop
+       ├─ Student Member  → /welcome/member : join code (instant) or request to join (officer approves)
+       └─ Student Officer → /welcome/officer: create org (you become President) or ask for an officer/committee seat (President approves)
+  → /m/[org] member portal  or  /o/[org] officer console (committee and above)
+```
+
+### 0.2 Roles (per org) and who decides
+| Role | Granted by | Officer console | File requests | Approve on-chain | Manage people |
+|---|---|---|---|---|---|
+| President | Creating the org | Yes | Yes | If marked signer | Everything; only one who approves officer/committee seats, sets signers, activates treasury |
+| Officer (exec board) | President | Yes | Yes | If marked signer | Approve member joins, remove members, events, join code |
+| Committee (exec comms) | President | Yes | Yes (a signer submits on-chain) | No | No |
+| Member | Join code or officer approval | No | No | No | No |
+| Platform admin | `PLATFORM_ADMIN_EMAILS` | n/a | n/a | n/a | Verifies orgs at `/admin` |
+
+The four-level hierarchy lives in Supabase (`memberships.role`, `position_title`, `is_signer`). The chain only knows the signer list and the threshold.
+
+### 0.3 Sitemap (built)
+- **Member portal `/m/[org]`** (tabs on desktop, bottom tab bar on phones): Overview (on-chain balance, money in/out, where the money went by category, event budget vs spent, signer rule, latest activity) · **Requests** (pending / being prepared / closed) · Expenses (released) · My dues (pay test pesos, own payments) · Activity (timeline). Request detail `/m/[org]/requests/[id]`.
+- **Officer console `/o/[org]`** with a Notion-style sidebar (drawer below `lg`): Overview (+ set-up checklist) · Requests · New request · Collections (who paid) · Events & budgets · Members (join requests, roster, join code; officers+) · Officers & roles (President) · Org settings (President) · My wallet · Activity log · Switch to member view.
+- **`/admin`**: platform admins verify orgs.
+
+### 0.4 Contract surface (built: `blockchain/contracts/HeronTreasury.sol`, `PesoToken.sol`)
+One multi-org contract (verify once). `createOrg(signers[], threshold)` (caller = org admin = President's wallet) · `setSigners(orgId, signers[], threshold)` (admin only, resets approval counting for pending requests) · `deposit(orgId, amount, memberRef)` · `createRequest(orgId, amount, payee, eventId, receiptHash)` (signers only; a receipt hash can be used once) · `approve(requestId)` (signers; distinct; releases once on threshold) · `reject` (any signer, veto) · `cancel` (the submitter) · `setEventBudget(orgId, eventId, cap)` (stretch FR-10). Rules: ≥2 signers, 2 ≤ threshold ≤ signers. Events: `OrgCreated, SignersSet, Deposited, RequestCreated, Approved, Released, Rejected, Cancelled, EventBudgetSet`. 11 tests in `blockchain/test/HeronTreasury.ts`.
+
+### 0.5 Request lifecycle
+```
+draft (app only: receipt uploaded to private Storage, SHA-256 hashed, AI read once and cached, flags computed by code)
+  → a signer clicks "Submit to blockchain" (createRequest from their MetaMask)  → pending
+  → signers approve from their own wallets; the contract releases on the threshold → released
+  → or any signer rejects / the submitter cancels / a draft is withdrawn         → rejected / cancelled
+```
+After each wallet transaction the browser sends the tx hash to the server, which reads the receipt itself and **reconciles** the DB caches from contract events (`src/lib/chain/ledger.ts`). Pages also reconcile on load, so the chain always wins.
+
+### 0.6 Data (built: `src/db/schema.ts`, `drizzle/`)
+`profiles` · `orgs` (status, join_code, chain_org_id, cached signers/threshold) · `memberships` (role, requested_role, position_title, is_signer, status) · `events` (chain_event_id, category, budget) · `requests` (draft→… cache, receipt path/hash, flags) · `ai_checks` (cache by receipt hash) · `deposits` (cache, own-payments view) · `activity` (app-recorded timeline items). RLS on every table (read policies only), a profile trigger, the `hook_restrict_signup_domain` auth hook and the private `receipts` bucket are in `drizzle/0001_rls_auth_storage.sql`.
+
+### 0.7 Network
+Local Hardhat node (chain 31337) now, because the BSC faucet needs a mainnet balance. `src/lib/chain/config.ts` switches to BSC testnet (97) with env only. On the local node there are no explorer links; the UI says "Local test network".
 
 ---
 
@@ -192,6 +243,8 @@ In real orgs, officers usually *spend first, then liquidate with receipts*. Our 
 
 **Recommendation: build A for the demo; mention B as future work.** Confirm with your source which one orgs actually use. The `payee` in the contract is simply the officer's (or vendor's) wallet.
 
+> **Decided Nov 13:** A (reimbursement) is built. The payee defaults to the filing officer's linked wallet.
+
 ---
 
 ## 10. Wallets, keys and privacy (the part you said you're unsure about)
@@ -203,6 +256,8 @@ In real orgs, officers usually *spend first, then liquidate with receipts*. Our 
   - **Members never need a wallet to *view*.** The Member Portal reads public chain data and the database.
   - **Members' deposits in the demo:** use an app-managed "demo wallet" with a "Top up test pesos" button, and say openly that it's custodial for the demo. (This resolves the open item "hidden app-generated wallets".)
 - Real rollout: custody would be redesigned alongside the peso on-ramp.
+
+> **Decided Nov 13:** built as recommended. Officers link MetaMask by signing a message; members pay through the app relayer (custodial, said in the UI), which only mints test pesos and deposits. The relayer never creates, approves, rejects or cancels requests.
 
 **Privacy for the information-rich Member Portal:**
 - Everyone in the org sees: totals, every expense, receipts, AI notes, approvals.
@@ -251,7 +306,7 @@ On-chain, only addresses in the officer list can call `approve` / `createRequest
 
 ---
 
-## 15. Suggested edits to the PRD / Summary (not yet applied)
+## 15. Suggested edits to the PRD / Summary (applied Nov 13, see PRD FR-13 to FR-21)
 
 - Replace "Blockchain" and "AI" as one part with the **2 surfaces + trust layer** structure (3).
 - Add FR: *Approvals are signed on-chain by each officer; the app server cannot approve.*
@@ -263,10 +318,13 @@ On-chain, only addresses in the officer list can call `approve` / `createRequest
 
 ## 16. Open questions for the team
 
-1. Reimbursement or pay-ahead? (ask your source)
-2. Are officers OK using their own wallet in the demo?
-3. How much of a member's payment history should other members see?
+1. ~~Reimbursement or pay-ahead?~~ Reimbursement built; still confirm with your source.
+2. ~~Are officers OK using their own wallet in the demo?~~ Yes: MetaMask with imported Hardhat accounts locally.
+3. ~~How much of a member's payment history should other members see?~~ Own payments by name; others see totals; committee and above see the roster.
 4. Open-source the repo?
+5. Does a local-node deployment count for "deployed and verified on BSC"? Ask the organizers in writing.
+6. Should the President also need co-signatures to change signers (today the President's wallet alone can, publicly)? Future work.
+7. Should a member removed from an org be able to rejoin with the code? Today they can until officers reset the code.
 
 ## Sources
 - [The Block, Aug 2025](https://www.theblock.co/news/regulation/2025-08-28-philippine-senator-plans-bill-putting-national-budget-on-blockchain-368556) · [Decrypt](https://decrypt.co/337140/philippine-senator-suggests-putting-national-budget-on-chain)

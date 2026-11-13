@@ -1,18 +1,9 @@
 import { createPublicClient, http } from "viem";
-import { bscTestnet } from "viem/chains";
-import { publicEnv } from "@/lib/env/public";
+import { chain, RPC_URL } from "./config";
 
-export const chain = bscTestnet; // chain id 97, testnet only
+export { chain, explorerAddressUrl, explorerTxUrl } from "./config";
 
-/** Read-only client for BSC testnet (balances, contract reads, event logs). No keys here. */
+/** Read-only chain client (balances, contract reads, event logs). No keys here. */
 export function getPublicClient() {
-  return createPublicClient({ chain, transport: http(publicEnv().NEXT_PUBLIC_BSC_RPC_URL) });
-}
-
-export function explorerTxUrl(txHash: string) {
-  return `${chain.blockExplorers.default.url}/tx/${txHash}`;
-}
-
-export function explorerAddressUrl(address: string) {
-  return `${chain.blockExplorers.default.url}/address/${address}`;
+  return createPublicClient({ chain, transport: http(RPC_URL) });
 }
