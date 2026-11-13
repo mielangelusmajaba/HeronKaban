@@ -168,6 +168,7 @@ export async function getTimeline(org: Org, chainEvents?: ChainEvent[]): Promise
 /** Full story of one request, including the receipt-hash integrity check. */
 export async function getRequestDetail(org: Org, requestId: string) {
   const db = getDb();
+  await reconcileOrg(org); // status and approvals come from the chain
   const submitter = alias(profiles, "submitter");
   const [row] = await db
     .select({ r: requests, ev: events, filerName: filer.fullName, submitterName: submitter.fullName })

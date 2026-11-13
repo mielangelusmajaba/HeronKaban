@@ -5,14 +5,12 @@ import { RequestActions } from "@/components/treasury/chain-widgets";
 import { RequestDetailView } from "@/components/treasury/display";
 import { PageLoading } from "@/components/ui";
 import { requireOrgAccess } from "@/lib/auth";
-import { reconcileOrg } from "@/lib/chain/ledger";
 import { roleAtLeast } from "@/lib/roles";
 import { getRequestDetail } from "@/lib/treasury/queries";
 
 async function Detail({ params }: PageProps<"/o/[org]/requests/[id]">) {
   const { org: slug, id } = await params;
   const { viewer, org, membership } = await requireOrgAccess(slug, "committee");
-  await reconcileOrg(org);
   const d = await getRequestDetail(org, id).catch(() => null);
   if (!d) notFound();
   const r = d.request;
