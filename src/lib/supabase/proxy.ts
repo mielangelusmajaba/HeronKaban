@@ -1,9 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Paths that need a signed-in user. Finer checks (domain, consent, org role) run on the server. */
+const PROTECTED = ["/m", "/o", "/welcome", "/admin", "/auth/consent"];
+
+function isProtected(pathname: string) {
+  return PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
 /**
- * Refreshes the Supabase auth session cookie on each request.
- * Route protection (UMak-domain check, role gates) is NOT done here yet.
+ * Refreshes the Supabase auth session cookie on each request and bounces signed-out
+ * visitors away from app pages. This is a coarse, optimistic check only: pages and
+ * server actions re-check the user (src/lib/auth.ts).
  */
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -28,7 +36,16 @@ export async function updateSession(request: NextRequest) {
   });
 
   // Don't run code between createServerClient and getClaims(): this call refreshes the token.
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+
+  if (!data?.claims && isProtected(request.nextUrl.pathname)) {
+    const to = request.nextUrl.clone();
+    to.pathname = "/auth/sign-in";
+    to.search = `?next=${encodeURIComponent(request.nextUrl.pathname + request.nextUrl.search)}`;
+    const redirect = NextResponse.redirect(to);
+    response.cookies.getAll().forEach((c) => redirect.cookies.set(c));
+    return redirect;
+  }
 
   return response;
 }
