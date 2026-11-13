@@ -13,12 +13,14 @@ export type NavItem = { href: string; label: string; icon: string; badge?: numbe
  */
 export function Sidebar({ items, title, subtitle }: { items: NavItem[]; title: string; subtitle: string }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  // The drawer remembers which page it was opened on, so navigating closes it.
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (v: boolean) => setOpenOn(v ? pathname : null);
 
-  // Close the drawer on navigation and on Escape.
-  useEffect(() => setOpen(false), [pathname]);
+  // Close on Escape.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpenOn(null);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);

@@ -1,108 +1,334 @@
-import Image from "next/image";
 import Link from "next/link";
+import { ButtonLink, Logo } from "@/components/ui";
+
+// Static landing page (no session read, so it prerenders). Plain language, no crypto jargon.
+
+const STEPS = [
+  {
+    title: "Members pay dues",
+    body: "Dues go into the org's treasury, a shared account that no single officer controls.",
+  },
+  {
+    title: "An officer files an expense",
+    body: "They bought supplies for an event, so they upload the receipt and say what it was for.",
+  },
+  {
+    title: "AI reads the receipt",
+    body: "It reads the total, items and date. Simple rules compare them with the request and the event budget, and anything odd is marked “Needs review.”",
+  },
+  {
+    title: "Officers approve, funds are released",
+    body: "When enough different officers approve (for example 2 of 3), the treasury pays the officer back automatically.",
+  },
+];
+
+const BENEFITS = [
+  {
+    who: "For members",
+    points: [
+      "See the balance, every peso in and out, and where it went",
+      "Open any expense to see its receipt, the AI notes and who approved it",
+      "See pending requests before money moves",
+      "Your own payments stay private; others see totals only",
+    ],
+  },
+  {
+    who: "For officers & treasurers",
+    points: [
+      "Proof that you spent funds properly, with every step on record",
+      "Less paperwork: receipts, approvals and liquidation in one place",
+      "The AI catches typos, mismatched totals and duplicate receipts early",
+      "No single person carries all the trust (or the blame)",
+    ],
+  },
+  {
+    who: "For the org & university",
+    points: [
+      "Records that can't be quietly edited after the fact",
+      "Clear roles: President, officers, committee and members",
+      "Supports the Student Handbook's rules on handling org funds",
+      "Privacy first: names and emails never go on the blockchain",
+    ],
+  },
+];
+
+const FAQ = [
+  {
+    q: "Is this real money?",
+    a: "Not yet. This prototype uses “test pesos” on a test network, with 1 test peso standing for ₱1. Real collections still go through your org's usual process. Connecting GCash or cash is future work.",
+  },
+  {
+    q: "Does the AI decide what gets paid?",
+    a: "No. The AI only reads receipts. Plain rules compare the numbers, and anything unusual is marked “Needs review.” People make every decision, and the AI can't approve, block or move money.",
+  },
+  {
+    q: "Can officers still approve a bad expense?",
+    a: "If enough officers agree, yes. What changes is that it can't be hidden: every approval is permanent, public to members and tied to the officer who made it.",
+  },
+  {
+    q: "Who can sign in?",
+    a: "Only University of Makati students with a UMak Google account (@umak.edu.ph). This is checked on our server, not just on the page.",
+  },
+  {
+    q: "What is stored about me?",
+    a: "Your name, UMak email, college, the orgs you join and your consent. Officers who approve also link a wallet. Your name and email never go on the blockchain.",
+  },
+];
+
+function Check() {
+  return (
+    <svg className="mt-0.5 size-5 shrink-0 text-blue-700" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+      <path fillRule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.6l7.3-7.3a1 1 0 0 1 1.4 0Z" clipRule="evenodd" />
+    </svg>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      {/* Hero Section */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
-        <div className="w-full max-w-4xl text-center space-y-8">
-          {/* Logo/Brand */}
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900">
-              HeronKaban
-            </h1>
-          </div>
-
-          {/* Tagline */}
-          <p className="text-xl sm:text-2xl text-gray-700 font-medium max-w-2xl mx-auto">
-            Transparent, AI-checked treasury for UMak student organizations
-          </p>
-
-          {/* Value Props */}
-          <div className="grid sm:grid-cols-3 gap-6 mt-12 text-left">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Full Transparency</h3>
-              <p className="text-sm text-gray-600">See exactly where your dues go, with receipts and AI verification</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">AI-Checked</h3>
-              <p className="text-sm text-gray-600">Every receipt is automatically checked for accuracy and flags issues</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Multi-Approval</h3>
-              <p className="text-sm text-gray-600">Requires multiple officers to approve before funds are released</p>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="mt-12 space-y-4">
-            <Link 
-              href="/auth/signin"
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold text-lg shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-all hover:shadow-xl hover:shadow-blue-600/40 hover:-translate-y-0.5"
-            >
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Sign in with UMak Google
+    <div className="flex min-h-dvh flex-col bg-white">
+      {/* Nav */}
+      <header className="sticky top-0 z-30 border-b border-gray-100 bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+          <Logo size="sm" />
+          <nav className="hidden items-center gap-6 text-sm text-gray-700 md:flex" aria-label="Sections">
+            <a href="#how" className="hover:text-gray-900">How it works</a>
+            <a href="#benefits" className="hover:text-gray-900">Benefits</a>
+            <a href="#trust" className="hover:text-gray-900">Why trust it</a>
+            <a href="#faq" className="hover:text-gray-900">FAQ</a>
+          </nav>
+          <div className="flex items-center gap-2">
+            <Link href="/auth/sign-in" className="hidden min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-gray-800 hover:bg-gray-100 sm:inline-flex">
+              Sign in
             </Link>
-            <p className="text-sm text-gray-500">
-              UMak student organizations only
-            </p>
-          </div>
-
-          {/* Built with */}
-          <div className="mt-16 pt-8 border-t border-gray-200">
-            <p className="text-xs text-gray-500 mb-3">Built on</p>
-            <div className="flex items-center justify-center gap-6 flex-wrap">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <div className="w-8 h-8 bg-yellow-400 rounded-lg"></div>
-                <span className="font-medium">BNB Smart Chain</span>
+            <ButtonLink href="/auth/sign-up" className="!px-3 sm:!px-4">
+              Get started
+            </ButtonLink>
+            <details className="relative md:hidden">
+              <summary className="grid size-11 cursor-pointer list-none place-items-center rounded-lg hover:bg-gray-100 [&::-webkit-details-marker]:hidden" aria-label="Menu">
+                ☰
+              </summary>
+              <div className="absolute right-0 mt-1 w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
+                {[
+                  ["#how", "How it works"],
+                  ["#benefits", "Benefits"],
+                  ["#trust", "Why trust it"],
+                  ["#faq", "FAQ"],
+                ].map(([href, label]) => (
+                  <a key={href} href={href} className="block rounded-lg px-3 py-2.5 text-sm hover:bg-gray-50">
+                    {label}
+                  </a>
+                ))}
+                <Link href="/auth/sign-in" className="block rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-gray-50">
+                  Sign in
+                </Link>
               </div>
-              <div className="text-gray-300">•</div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#4285F4"/>
-                  <path d="M2 17L12 22L22 17V12L12 17L2 12V17Z" fill="#34A853"/>
-                </svg>
-                <span className="font-medium">AI-Powered</span>
-              </div>
-            </div>
+            </details>
           </div>
         </div>
+      </header>
+
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="bg-gradient-to-b from-blue-50 to-white">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-2">
+            <div>
+              <p className="text-sm font-semibold text-blue-700">For University of Makati student organizations</p>
+              <h1 className="mt-3 text-4xl leading-tight font-bold tracking-tight text-gray-900 sm:text-5xl">
+                Know where your org&apos;s dues go.
+              </h1>
+              <p className="mt-4 max-w-xl text-lg text-gray-700">
+                HeronKaban keeps org funds in a shared treasury that releases money only when several officers approve. Every
+                receipt is checked by AI, and every member can see the full history.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <ButtonLink href="/auth/sign-up" className="px-6 py-3 text-base">
+                  Create your account
+                </ButtonLink>
+                <ButtonLink href="/auth/sign-in" variant="secondary" className="px-6 py-3 text-base">
+                  Sign in with UMak Google
+                </ButtonLink>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">UMak Google accounts only · Prototype on a test network, no real money</p>
+            </div>
+
+            {/* Illustrative preview (static) */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xl sm:p-6" aria-label="Example of what members see">
+              <p className="text-xs font-medium text-gray-500 uppercase">Example org treasury</p>
+              <div className="mt-2 flex items-end justify-between">
+                <p className="text-3xl font-bold text-gray-900">₱18,450.00</p>
+                <span className="text-xs font-medium text-green-800">⛓ Verified on-chain</span>
+              </div>
+              <ul className="mt-5 space-y-3 text-sm">
+                <li className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 p-3">
+                  <span>
+                    <span className="block font-medium">Tarpaulin for Org Week</span>
+                    <span className="text-xs text-gray-500">Approved by 2 of 3 officers</span>
+                  </span>
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">Released</span>
+                </li>
+                <li className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 p-3">
+                  <span>
+                    <span className="block font-medium">Seminar snacks</span>
+                    <span className="text-xs text-gray-500">Receipt total differs from request</span>
+                  </span>
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900">Needs review</span>
+                </li>
+                <li className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 p-3">
+                  <span>
+                    <span className="block font-medium">Membership dues</span>
+                    <span className="text-xs text-gray-500">42 payments this sem</span>
+                  </span>
+                  <span className="font-semibold text-green-800">+₱8,400</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Problem */}
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">The problem we&apos;re solving</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              ["Hard to follow", "Liquidation reports are mostly piles of receipts. Members can't easily tell if spending matched the event's purpose."],
+              ["One person holds the trust", "Everyone has to trust the treasurer's records, which can be edited or misread, even by honest mistake."],
+              ["Manual tracking", "Spreadsheets and paper slow officers down, and any error can look like misuse."],
+            ].map(([t, b]) => (
+              <div key={t} className="rounded-xl border border-gray-200 p-5">
+                <p className="font-semibold text-gray-900">{t}</p>
+                <p className="mt-1 text-sm text-gray-700">{b}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-sm text-gray-600">
+            HeronKaban makes spending visible and checkable. It doesn&apos;t accuse anyone: it gives honest officers an easy way to show
+            their work.
+          </p>
+        </section>
+
+        {/* How it works */}
+        <section id="how" className="bg-gray-50">
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">How it works</h2>
+            <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {STEPS.map((s, i) => (
+                <li key={s.title} className="rounded-xl border border-gray-200 bg-white p-5">
+                  <span className="grid size-8 place-items-center rounded-full bg-blue-700 text-sm font-bold text-white">{i + 1}</span>
+                  <p className="mt-3 font-semibold text-gray-900">{s.title}</p>
+                  <p className="mt-1 text-sm text-gray-700">{s.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* Benefits */}
+        <section id="benefits" className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Benefits</h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {BENEFITS.map((b) => (
+              <div key={b.who} className="rounded-xl border border-gray-200 p-6">
+                <p className="text-lg font-semibold text-gray-900">{b.who}</p>
+                <ul className="mt-4 space-y-3 text-sm text-gray-700">
+                  {b.points.map((p) => (
+                    <li key={p} className="flex gap-2">
+                      <Check />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Trust */}
+        <section id="trust" className="bg-blue-950 text-white">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-2">
+            <div>
+              <h2 className="text-2xl font-bold sm:text-3xl">Why use a blockchain?</h2>
+              <p className="mt-3 text-blue-100">
+                A normal database can be edited by whoever runs it. HeronKaban keeps the money in a small program on BNB Smart Chain
+                (a shared record book nobody owns). Its rules are public and nobody can bend them, including us.
+              </p>
+              <ul className="mt-5 space-y-3 text-sm text-blue-50">
+                <li className="flex gap-2">
+                  <span aria-hidden>⛓</span> Money leaves only when enough different officers approve. One officer can never move funds alone.
+                </li>
+                <li className="flex gap-2">
+                  <span aria-hidden>🔏</span> Each receipt&apos;s digital fingerprint is recorded, so a swapped or edited receipt shows as
+                  &quot;doesn&apos;t match.&quot;
+                </li>
+                <li className="flex gap-2">
+                  <span aria-hidden>📜</span> Payments, approvals and releases form a history that can&apos;t be rewritten.
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold sm:text-3xl">What the AI does, and doesn&apos;t</h2>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-xl bg-white/10 p-4">
+                  <p className="font-semibold">Does</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-blue-50">
+                    <li>Reads the receipt&apos;s total, items and date</li>
+                    <li>Helps spot mismatched totals, duplicate receipts, over-budget spending and unusual purchase mixes</li>
+                  </ul>
+                </div>
+                <div className="rounded-xl bg-white/10 p-4">
+                  <p className="font-semibold">Doesn&apos;t</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-blue-50">
+                    <li>Approve, block or move money</li>
+                    <li>Accuse anyone: notes say &quot;Needs review&quot;</li>
+                    <li>Replace the officers&apos; judgment</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-4 text-sm text-blue-200">
+                Honest limits: the record proves who approved what and when, not that a receipt is genuine. Officers who agree can
+                still approve a bad expense, but it can&apos;t be hidden.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Questions</h2>
+          <div className="mt-6 divide-y divide-gray-200 rounded-xl border border-gray-200">
+            {FAQ.map((f) => (
+              <details key={f.q} className="group p-4 sm:p-5">
+                <summary className="flex min-h-8 cursor-pointer list-none items-center justify-between gap-3 font-medium text-gray-900 [&::-webkit-details-marker]:hidden">
+                  {f.q}
+                  <span className="text-gray-400 transition group-open:rotate-45" aria-hidden>
+                    +
+                  </span>
+                </summary>
+                <p className="mt-2 text-sm text-gray-700">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="bg-gray-50">
+          <div className="mx-auto max-w-6xl px-4 py-14 text-center sm:px-6">
+            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Ready to open your org&apos;s books?</h2>
+            <p className="mt-2 text-gray-700">Join your org as a member, or create one as an officer.</p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <ButtonLink href="/auth/sign-up" className="px-6 py-3 text-base">
+                Create your account
+              </ButtonLink>
+              <ButtonLink href="/auth/sign-in" variant="secondary" className="px-6 py-3 text-base">
+                Sign in
+              </ButtonLink>
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="py-6 px-4 border-t border-gray-200 bg-white/50">
-        <div className="max-w-7xl mx-auto text-center text-sm text-gray-600">
-          <p>University of Makati • BCC 2026 × Binance Academy Hackathon</p>
-        </div>
+      <footer className="border-t border-gray-200 px-4 pt-8 pb-[max(2rem,env(safe-area-inset-bottom))] text-center text-sm text-gray-600 sm:px-6">
+        <p>HeronKaban · Heron for the UMak mascot, kaban for treasury chest</p>
+        <p className="mt-1 text-xs">University of Makati · BCC 2026 × Binance Academy Hackathon prototype · test network, no real funds</p>
       </footer>
     </div>
   );
